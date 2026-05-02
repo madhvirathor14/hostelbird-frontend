@@ -1,7 +1,7 @@
 # Hostelbird Hackathon Submission
-**Participant:** [Tera Naam]  
-**Date:** April 30, 2026  
-**GitHub Repo:** [Link]
+**Participant:** Madhvi Rathore 
+**Date:** 2 may, 2026  
+**GitHub Repo:** https://github.com/madhvirathor14/hostelbird-frontend/
 
 ---
 
