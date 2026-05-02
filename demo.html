@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hostelbird Bug Fixes — Hackathon Submission</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #1a1a1a; }
+
+  header {
+    background: linear-gradient(135deg, #FF5722, #FF8A65);
+    color: white;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  header h1 { font-size: 26px; font-weight: 800; }
+  header p { margin-top: 8px; opacity: 0.9; font-size: 14px; }
+
+  nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+    background: #fff;
+    border-bottom: 2px solid #eee;
+    padding: 0 16px;
+  }
+  nav button {
+    flex-shrink: 0;
+    padding: 14px 20px;
+    border: none;
+    background: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  nav button.active { color: #FF5722; border-bottom-color: #FF5722; }
+
+  .section { display: none; padding: 24px 16px; max-width: 480px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* BUG CARD */
+  .bug-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .bug-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #FF5722; margin-bottom: 6px; }
+  .bug-card h3 { font-size: 17px; margin-bottom: 8px; }
+  .bug-card p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 14px; }
+
+  /* DATE PICKER FIX */
+  .row { display: flex; gap: 14px; margin-bottom: 12px; }
+  .field { flex: 1; }
+  .field label { display: block; font-size: 12px; font-weight: 700; color: #555; margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1.5px solid #ddd; font-size: 14px; outline: none;
+    font-family: inherit;
+  }
+  .error-box {
+    background: #FFF3CD; border: 1px solid #FFCA28;
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 13px; color: #7A5800; margin-bottom: 10px;
+  }
+  .success-box {
+    background: #E8F5E9; border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; color: #2E7D32; margin-bottom: 10px;
+  }
+  .btn-primary {
+    width: 100%; padding: 13px; background: #FF5722; color: #fff;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+  }
+
+  /* OFFLINE FIX */
+  .offline-screen {
+    text-align: center; padding: 40px 20px;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .offline-screen .icon { font-size: 56px; margin-bottom: 16px; }
+  .offline-screen h3 { font-size: 20px; margin-bottom: 8px; }
+  .offline-screen p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+  .online-badge {
+    display: inline-block; background: #E8F5E9; color: #2E7D32;
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* FILTER FIX */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chip {
+    padding: 6px 14px; border-radius: 20px; border: none;
+    font-size: 13px; cursor: pointer; font-weight: 500;
+    background: #f0f0f0; color: #333;
+  }
+  .chip.on { background: #FF5722; color: #fff; }
+  .filter-section { margin-bottom: 16px; }
+  .filter-label { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 6px; display: block; }
+  .filter-summary {
+    background: #FFF3E0; padding: 10px 14px; border-radius: 8px;
+    font-size: 12px; color: #E65100; margin-top: 12px;
+  }
+  .reset-btn {
+    background: none; border: 1px solid #ccc; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; cursor: pointer; color: #666;
+  }
+  .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+
+  /* CONFIRMATION FIX */
+  .confirm-banner {
+    background: linear-gradient(135deg, #FF5722, #FF8A65);
+    padding: 32px 20px; text-align: center; color: #fff; border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .check-icon {
+    width: 56px; height: 56px; background: rgba(255,255,255,0.25);
+    border-radius: 50%; font-size: 26px; display: flex;
+    align-items: center; justify-content: center;
+    margin: 0 auto 14px; line-height: 1;
+  }
+  .booking-id-box {
+    background: #fff; border: 2px dashed #FF5722; border-radius: 12px;
+    padding: 16px; text-align: center; margin-bottom: 12px;
+  }
+  .bid-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; display: block; }
+  .bid-val { font-size: 22px; font-weight: 800; color: #FF5722; letter-spacing: 3px; display: block; margin: 4px 0; }
+  .bid-hint { font-size: 12px; color: #aaa; }
+  .detail-card {
+    background: #fff; border-radius: 12px; padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px;
+  }
+  .detail-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .detail-row .k { color: #888; }
+  .detail-row .v { font-weight: 600; text-align: right; max-width: 60%; }
+  .card-head { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .steps-box { background: #E8F5E9; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+  .steps-box ul { padding-left: 18px; font-size: 13px; color: #2E7D32; line-height: 2.1; }
+  .btn-outline {
+    width: 100%; padding: 13px; background: #fff; color: #FF5722;
+    border: 1.5px solid #FF5722; border-radius: 8px; font-size: 14px;
+    font-weight: 700; cursor: pointer; margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐦 Hostelbird Bug Fixes</h1>
+  <p>Build & Break Hackathon Submission &nbsp;|&nbsp; 4 Real Issues Fixed</p>
+</header>
+
+<nav>
+  <button class="active" onclick="show('fix1', this)">🗓 Date Picker</button>
+  <button onclick="show('fix2', this)">📡 Offline</button>
+  <button onclick="show('fix3', this)">🎛 Filters</button>
+  <button onclick="show('fix4', this)">✅ Confirmation</button>
+</nav>
+
+<!-- FIX 1 -->
+<div id="fix1" class="section active">
+  <div class="bug-card">
+    <div class="bug-tag">Bug #1 — Silent Failure</div>
+    <h3>Date Picker Allows Invalid Dates</h3>
+    <p>Check-out can be set before check-in. No error appears. Users get wrong results or a broken booking without knowing why.</p>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-tag">Fix Preview</div>
+    <div class="row">
+      <div class="field">
+        <label>Check-in</label>
+        <input type="date" id="ci" oninput="validateDates()" />
+      </div>
+      <div class="field">
+        <label>Check-out</label>
+        <input type="date" id="co" oninput="validateDates()" />
+      </div>
+    </div>
+    <div id="date-msg"></div>
+    <button class="btn-primary" onclick="searchHostels()">Search Hostels</button>
+  </div>
+</div>
+
+<!-- FIX 2 -->
+<div id="fix2" class="section">
+  <div class="bug-card">
+    <div class="bug-tag">Bug #2 — UX Gap</div>
+    <h3>Blank Screen on No Internet</h3>
+    <p>When offline, the app shows an infinite spinner with no message and no retry button. Budget travelers in hills/trains hit this constantly.</p>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-tag">Fix Preview</div>
+    <div id="network-demo">
+      <div class="online-badge" id="net-status">🟢 You're Online</div>
+      <div id="online-content">
+        <p style="font-size:14px;color:#555;margin-bottom:16px;">App content loads normally here when connected.</p>
+      </div>
+    </div>
+    <button class="btn-primary" id="toggle-net-btn" onclick="toggleNetwork()">Simulate Going Offline</button>
+  </div>
+</div>
+
+<!-- FIX 3 -->
+<div id="fix3" class="section">
+  <div class="bug-card">
+    <div class="bug-tag">Bug #3 — State Loss</div>
+    <h3>Filters Reset on Back Navigation</h3>
+    <p>User applies price range + amenity filters, clicks into a hostel, hits back — everything resets. Makes comparing hostels very frustrating.</p>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-tag">Fix Preview — Filters Persist</div>
+    <div class="filter-header">
+      <span style="font-size:16px;font-weight:700;">Filters</span>
+      <button class="reset-btn" onclick="resetFilters()">Reset All</button>
+    </div>
+
+    <div class="filter-section">
+      <label class="filter-label">Max Price: ₹<span id="price-val">1200</span></label>
+      <input type="range" min="200" max="5000" value="1200" oninput="updatePrice(this)" style="width:100%"/>
+    </div>
+
+    <div class="filter-section">
+      <label class="filter-label">Room Type</label>
+      <div class="chip-row" id="room-chips">
+        <button class="chip on" onclick="selectRoom(this,'any')">Any</button>
+        <button class="chip" onclick="selectRoom(this,'dorm')">Dorm</button>
+        <button class="chip" onclick="selectRoom(this,'private')">Private</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <label class="filter-label">Amenities</label>
+      <div class="chip-row" id="amenity-chips">
+        <button class="chip" onclick="toggleChip(this)">WiFi</button>
+        <button class="chip" onclick="toggleChip(this)">AC</button>
+        <button class="chip" onclick="toggleChip(this)">Locker</button>
+        <button class="chip" onclick="toggleChip(this)">Hot Water</button>
+        <button class="chip" onclick="toggleChip(this)">Breakfast</button>
+      </div>
+    </div>
+
+    <div class="filter-summary" id="filter-summary">Active: Max ₹1200 · Any room · No amenities selected</div>
+
+    <p style="font-size:12px;color:#aaa;margin-top:12px;">
+      ↩ Navigate away and back — filters stay saved (stored in app state/context)
+    </p>
+  </div>
+</div>
+
+<!-- FIX 4 -->
+<div id="fix4" class="section">
+  <div class="bug-card">
+    <div class="bug-tag">Bug #4 — Missing Screen</div>
+    <h3>No Booking Confirmation Page</h3>
+    <p>After payment completes, no confirmation screen with booking ID, hostel info, or next steps. Users are unsure if the booking went through.</p>
+  </div>
+
+  <div class="confirm-banner">
+    <div class="check-icon">✓</div>
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Booking Confirmed!</h2>
+    <p style="font-size:14px;opacity:0.9;">Your spot is reserved. Get ready for the trip! 🎒</p>
+  </div>
+
+  <div class="booking-id-box">
+    <span class="bid-label">Booking ID</span>
+    <span class="bid-val">HB-2026-48291</span>
+    <span class="bid-hint">Show this at hostel reception</span>
+  </div>
+
+  <div class="detail-card">
+    <div class="card-head">📍 Hostel Details</div>
+    <div class="detail-row"><span class="k">Hostel</span><span class="v">Rishikesh Backpackers Den</span></div>
+    <div class="detail-row"><span class="k">Room</span><span class="v">Mixed Dorm (6-bed)</span></div>
+    <div class="detail-row"><span class="k">Check-in</span><span class="v">10 May 2026</span></div>
+    <div class="detail-row"><span class="k">Check-out</span><span class="v">13 May 2026</span></div>
+    <div class="detail-row"><span class="k">Amount Paid</span><span class="v" style="color:#2E7D32;font-size:15px;">₹1,350 via UPI</span></div>
+  </div>
+
+  <div class="steps-box">
+    <div class="card-head">🗺 What's Next</div>
+    <ul>
+      <li>Confirmation SMS & email sent shortly</li>
+      <li>Show Booking ID at hostel check-in</li>
+      <li>Carry a valid govt. ID</li>
+      <li>Contact hostel for early check-in</li>
+    </ul>
+  </div>
+
+  <button class="btn-primary">View My Bookings</button>
+  <button class="btn-outline">Explore Things To Do in Rishikesh</button>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Fix 1 logic
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ci').min = today;
+  document.getElementById('co').min = today;
+
+  function validateDates() {
+    const ci = document.getElementById('ci').value;
+    const co = document.getElementById('co').value;
+    const msg = document.getElementById('date-msg');
+    if (!ci || !co) { msg.innerHTML = ''; return; }
+    if (co <= ci) {
+      msg.innerHTML = '<div class="error-box">⚠️ Check-out must be after check-in.</div>';
+    } else {
+      const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
+      msg.innerHTML = `<div class="success-box">✅ ${nights} night stay selected</div>`;
+    }
+  }
+  function searchHostels() {
+    const ci = document.getElementById('ci').value;
+    const co = document.getElementById('co').value;
+    if (!ci || !co || co <= ci) {
+      document.getElementById('date-msg').innerHTML = '<div class="error-box">⚠️ Please select valid check-in and check-out dates.</div>';
+    } else {
+      alert('✅ Searching hostels for selected dates!');
+    }
+  }
+
+  // Fix 2 logic
+  let simOffline = false;
+  function toggleNetwork() {
+    simOffline = !simOffline;
+    const btn = document.getElementById('toggle-net-btn');
+    const status = document.getElementById('net-status');
+    const content = document.getElementById('online-content');
+    if (simOffline) {
+      status.innerHTML = '🔴 You\'re Offline';
+      status.style.background = '#FFEBEE';
+      status.style.color = '#C62828';
+      content.innerHTML = `
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:48px;margin-bottom:12px;">📡</div>
+          <h3 style="margin-bottom:8px;">No Internet Connection</h3>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Check your WiFi or mobile data.</p>
+          <button class="btn-primary" style="max-width:200px;" onclick="toggleNetwork()">Try Again</button>
+          <p style="font-size:12px;color:#aaa;margin-top:12px;">💡 Saved hostels still viewable offline</p>
+        </div>`;
+      btn.textContent = 'Simulate Going Online';
+    } else {
+      status.innerHTML = '🟢 You\'re Online';
+      status.style.background = '#E8F5E9';
+      status.style.color = '#2E7D32';
+      content.innerHTML = '<p style="font-size:14px;color:#555;margin-bottom:16px;">App content loads normally here when connected.</p>';
+      btn.textContent = 'Simulate Going Offline';
+    }
+  }
+
+  // Fix 3 logic
+  let filters = { price: 1200, room: 'any', amenities: [] };
+  function updatePrice(el) {
+    filters.price = el.value;
+    document.getElementById('price-val').textContent = el.value;
+    updateSummary();
+  }
+  function selectRoom(btn, type) {
+    document.querySelectorAll('#room-chips .chip').forEach(c => c.classList.remove('on'));
+    btn.classList.add('on');
+    filters.room = type;
+    updateSummary();
+  }
+  function toggleChip(btn) {
+    btn.classList.toggle('on');
+    const label = btn.textContent;
+    if (filters.amenities.includes(label)) {
+      filters.amenities = filters.amenities.filter(a => a !== label);
+    } else {
+      filters.amenities.push(label);
+    }
+    updateSummary();
+  }
+  function resetFilters() {
+    filters = { price: 1200, room: 'any', amenities: [] };
+    document.getElementById('price-val').textContent = '1200';
+    document.querySelector('input[type=range]').value = 1200;
+    document.querySelectorAll('#room-chips .chip').forEach((c,i) => { c.classList.toggle('on', i===0); });
+    document.querySelectorAll('#amenity-chips .chip').forEach(c => c.classList.remove('on'));
+    updateSummary();
+  }
+  function updateSummary() {
+    const a = filters.amenities.length > 0 ? filters.amenities.join(', ') : 'None';
+    document.getElementById('filter-summary').textContent =
+      `Active: Max ₹${filters.price} · ${filters.room.charAt(0).toUpperCase()+filters.room.slice(1)} · ${a}`;
+  }
+</script>
+</body>
+</html>
